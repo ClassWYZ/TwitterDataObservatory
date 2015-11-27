@@ -3,7 +3,7 @@ platform :ios, '8.0'
 # Uncomment this line if you're using Swift
 # use_frameworks!
 
-target 'TwitterDataObservertory' do
+target 'TwitterDataObservatory' do
 
 pod 'Fabric'
 pod 'TwitterKit'
@@ -11,7 +11,7 @@ pod 'TwitterCore'
 
 end
 
-target 'TwitterDataObservertoryTests' do
+target 'TwitterDataObservatoryTests' do
 
 end
 
