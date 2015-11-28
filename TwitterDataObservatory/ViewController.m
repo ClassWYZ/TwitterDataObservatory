@@ -58,13 +58,21 @@
                                                                             parameters:params];
                                  // Attach the account object to this request
                                  [request setAccount:account];
-                                 NSURLRequest *signedReq = [request preparedURLRequest];
                                  
+                                 //NSURLRequest *signedReq = [request preparedURLRequest];
+                                 [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
+                                     NSString *dataString1 = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+                                     NSError *e = nil;
+                                     NSArray *responseJson = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:&e];
+                                     //NSLog(dataString1);
+                                 }];
+                                 /*
                                  // make the connection, ensuring that it is made on the main runloop
                                  self.twitterConnection = [[NSURLConnection alloc] initWithRequest:signedReq delegate:self startImmediately: NO];
                                  [self.twitterConnection scheduleInRunLoop:[NSRunLoop mainRunLoop]
                                                                    forMode:NSDefaultRunLoopMode];
                                  [self.twitterConnection start];
+                                 */
                                  
                              }
                          }
@@ -76,6 +84,7 @@
     // Dispose of any resources that can be recreated.
 }
 
+/*
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
     NSLog(@"Receive response from Twitter");
     //self.webData = [[NSMutableData alloc] init];
@@ -94,4 +103,5 @@
     //[self.uiWebView loadData:self.webData MIMEType: @"text/html" textEncodingName: @"UTF-8" baseURL:nil];
     
 }
+ */
 @end
