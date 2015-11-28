@@ -61,9 +61,14 @@
                                  
                                  //NSURLRequest *signedReq = [request preparedURLRequest];
                                  [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
-                                     NSString *dataString1 = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+                                     //NSString *dataString1 = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
                                      NSError *e = nil;
                                      NSArray *responseJson = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:&e];
+                                     NSArray *tweetsStatus = [responseJson valueForKey:@"statuses"];
+                                     NSMutableArray *tweetsTextArray = [[NSMutableArray alloc] init];
+                                     for (int i = 0; i < tweetsStatus.count; ++i) {
+                                         [tweetsTextArray addObject:[tweetsStatus[i] valueForKey:@"text"]];
+                                     }
                                      //NSLog(dataString1);
                                  }];
                                  /*
