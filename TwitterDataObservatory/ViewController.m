@@ -124,7 +124,7 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
                                             [newlyConstructedElement setValue:[tweetsStatus[i] valueForKey:@"place"] forKey:@"geo"];
                                              [analyzedTweets addObject:newlyConstructedElement];
                                          }
-                                         NSLog(analyzedTweets);
+                                         //NSLog(analyzedTweets);
                                         
                                      }
                                  }];

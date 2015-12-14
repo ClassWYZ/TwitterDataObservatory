@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		57F79A021DAF3236B80E9171 /* libPods-TwitterDataObservatory.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B00D5FD4259A2DC9871BFAA /* libPods-TwitterDataObservatory.a */; };
+		EF2B7F871C1EABA100C5FF50 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF2B7F861C1EABA100C5FF50 /* MapKit.framework */; };
 		EF3616031C0917D000F3BB58 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF3616021C0917D000F3BB58 /* main.m */; };
 		EF3616061C0917D100F3BB58 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EF3616051C0917D100F3BB58 /* AppDelegate.m */; };
 		EF3616091C0917D100F3BB58 /* TwitterDataObservatory.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EF3616071C0917D100F3BB58 /* TwitterDataObservatory.xcdatamodeld */; };
@@ -32,6 +33,7 @@
 		0B00D5FD4259A2DC9871BFAA /* libPods-TwitterDataObservatory.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TwitterDataObservatory.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		278AB1ECA1B3659396D39960 /* Pods-TwitterDataObservatory.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TwitterDataObservatory.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TwitterDataObservatory/Pods-TwitterDataObservatory.debug.xcconfig"; sourceTree = "<group>"; };
 		B92A686CDF98C5C7288AF2E5 /* Pods-TwitterDataObservatory.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TwitterDataObservatory.release.xcconfig"; path = "Pods/Target Support Files/Pods-TwitterDataObservatory/Pods-TwitterDataObservatory.release.xcconfig"; sourceTree = "<group>"; };
+		EF2B7F861C1EABA100C5FF50 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		EF3615FD1C0917D000F3BB58 /* TwitterDataObservatory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TwitterDataObservatory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EF3616011C0917D000F3BB58 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EF3616021C0917D000F3BB58 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -53,6 +55,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EF2B7F871C1EABA100C5FF50 /* MapKit.framework in Frameworks */,
 				57F79A021DAF3236B80E9171 /* libPods-TwitterDataObservatory.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -70,6 +73,7 @@
 		B90A89FC4A3F771315B2329B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EF2B7F861C1EABA100C5FF50 /* MapKit.framework */,
 				0B00D5FD4259A2DC9871BFAA /* libPods-TwitterDataObservatory.a */,
 			);
 			name = Frameworks;

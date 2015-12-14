@@ -7,10 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+@import MapKit;
 
 @interface ViewController : UIViewController
 
 extern NSString* const sentimentEngine;
+@property (strong, nonatomic) IBOutlet MKMapView *mapView;
 
 @end
 
