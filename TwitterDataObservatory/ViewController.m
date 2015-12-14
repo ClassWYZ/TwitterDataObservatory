@@ -19,6 +19,8 @@
 
 @implementation ViewController
 
+NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassifyJson?appid=wyzhang8@outlook.com";
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
@@ -43,7 +45,7 @@
                                  ACAccount *account = [twitterAccounts objectAtIndex:0];
                                  NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
                                  [params setObject:@"" forKey:@"q"];
-                                 [params setObject:@"40.8075,-73.9619,1.5mi" forKey:@"geocode"];
+                                 [params setObject:@"40.7903,-73.9597,1mi" forKey:@"geocode"];
                                  [params setObject:@"100" forKey:@"count"];
                                  //set any other criteria to track
                                  //params setObject:@"words, to, track" forKey@"track"];
@@ -69,19 +71,68 @@
                                      for (int i = 0; i < tweetsStatus.count; ++i) {
                                          [tweetsTextArray addObject:[tweetsStatus[i] valueForKey:@"text"]];
                                      }
-                                     //NSLog(dataString1);
+                                     NSMutableArray *tweetsJSONArray = [[NSMutableArray alloc] init];
+                                     for (int i = 0; i < tweetsTextArray.count; ++i) {
+                                        [tweetsJSONArray addObject:@{@"text":tweetsTextArray[i], @"id":@(i)}];
+                                     }
+                                     NSDictionary *sentimentJSON = @{@"data": tweetsJSONArray};
+                                     NSData *json = nil;
+                                     NSError *error2 = nil;
+                                     NSString *jsonString;
+                                     if ([NSJSONSerialization isValidJSONObject:sentimentJSON]) {
+                                        json = [NSJSONSerialization dataWithJSONObject:sentimentJSON options:NSJSONWritingPrettyPrinted error:&error2];
+                                        if (json != nil && error2 == nil)
+                                        {
+                                            jsonString = [[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding];
+                                            
+                                            json = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+                                            id jsonObject = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&error2];
+                                            NSLog(@"JSON: %@", jsonString);
+                                        }
+                                     }
+                                     if (json) {
+                                         NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
+                                         [request setURL:[NSURL URLWithString:sentimentEngine]];
+                                         [request setHTTPMethod:@"POST"];
+                                         [request setValue:@"application/json; charset=UTF-8" forHTTPHeaderField:@"Content-Type"];
+                                         [request setHTTPBody:json];
+                                         NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+                                         NSError *error3 = [[NSError alloc] init];
+                                         NSHTTPURLResponse *responseCode = nil;
+                                         
+                                         NSData *oResponseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&responseCode error:&error3];
+                                         
+                                         if([responseCode statusCode] != 200){
+                                             NSLog(@"Error getting %@, HTTP status code %li", url, (long) [responseCode statusCode]);
+                                         }
+                                         
+                                         NSString *dataStr;
+                                         dataStr = [[NSString alloc] initWithData:oResponseData encoding:NSASCIIStringEncoding];
+                                         if (!dataStr)
+                                         {
+                                             NSLog(@"ASCII not working, will try utf-8!");
+                                             dataStr = [[NSString alloc] initWithData:oResponseData encoding:NSUTF8StringEncoding];
+                                         }
+                                         
+                                         NSData *jsonData = [dataStr dataUsingEncoding:NSUTF8StringEncoding];
+                                         NSError *jsonError;
+                                         NSDictionary *analyzedData = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&jsonError];
+                                         NSArray *dataInAnalyzedData = analyzedData[@"data"];
+                                         NSMutableArray *analyzedTweets = [[NSMutableArray alloc] init];
+                                         for (int i = 0; i < dataInAnalyzedData.count; ++i) {
+                                             NSDictionary *newlyConstructedElement = [dataInAnalyzedData[i] mutableCopy];
+                                            [newlyConstructedElement setValue:[tweetsStatus[i] valueForKey:@"place"] forKey:@"geo"];
+                                             [analyzedTweets addObject:newlyConstructedElement];
+                                         }
+                                         NSLog(analyzedTweets);
+                                        
+                                     }
                                  }];
-                                 /*
-                                 // make the connection, ensuring that it is made on the main runloop
-                                 self.twitterConnection = [[NSURLConnection alloc] initWithRequest:signedReq delegate:self startImmediately: NO];
-                                 [self.twitterConnection scheduleInRunLoop:[NSRunLoop mainRunLoop]
-                                                                   forMode:NSDefaultRunLoopMode];
-                                 [self.twitterConnection start];
-                                 */
                                  
                              }
                          }
-                     }];
+                }];
+
 }
 
 - (void)didReceiveMemoryWarning {
@@ -89,11 +140,12 @@
     // Dispose of any resources that can be recreated.
 }
 
-/*
+
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
     NSLog(@"Receive response from Twitter");
     //self.webData = [[NSMutableData alloc] init];
 }
+
 
 - (void)connection:(NSURLConnection *)connection
     didReceiveData:(NSData *)data {
@@ -105,8 +157,9 @@
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    NSLog(@"A");
     //[self.uiWebView loadData:self.webData MIMEType: @"text/html" textEncodingName: @"UTF-8" baseURL:nil];
     
 }
- */
+
 @end
