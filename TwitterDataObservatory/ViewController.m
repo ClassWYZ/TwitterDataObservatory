@@ -162,4 +162,19 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
     
 }
 
+- (IBAction)setMap:(id)sender {
+    switch (((UISegmentedControl *) sender).selectedSegmentIndex) {
+        case 0:
+            self.mapView.mapType = MKMapTypeStandard;
+            break;
+        case 1:
+            self.mapView.mapType = MKMapTypeSatellite;
+            break;
+        case 2:
+            self.mapView.mapType = MKMapTypeHybrid;
+            break;
+        default:
+            break;
+    }
+}
 @end

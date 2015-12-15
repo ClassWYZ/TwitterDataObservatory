@@ -13,6 +13,7 @@
 
 extern NSString* const sentimentEngine;
 @property (strong, nonatomic) IBOutlet MKMapView *mapView;
+- (IBAction)setMap:(id)sender;
 
 @end
 

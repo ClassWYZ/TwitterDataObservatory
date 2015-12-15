@@ -19,6 +19,17 @@
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="59K-oM-lmM">
                                 <rect key="frame" x="0.0" y="-1" width="320" height="530"/>
                             </mapView>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="ZYW-yn-1WZ">
+                                <rect key="frame" x="69" y="536" width="182" height="29"/>
+                                <segments>
+                                    <segment title="Standard"/>
+                                    <segment title="Satellite"/>
+                                    <segment title="Hybird"/>
+                                </segments>
+                                <connections>
+                                    <action selector="setMap:" destination="vXZ-lx-hvc" eventType="valueChanged" id="uYQ-Mw-G0n"/>
+                                </connections>
+                            </segmentedControl>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
