@@ -17,6 +17,7 @@
 		EF3616111C0917D100F3BB58 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF3616101C0917D100F3BB58 /* Images.xcassets */; };
 		EF3616141C0917D100F3BB58 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = EF3616121C0917D100F3BB58 /* LaunchScreen.xib */; };
 		EF3616201C0917D100F3BB58 /* TwitterDataObservatoryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EF36161F1C0917D100F3BB58 /* TwitterDataObservatoryTests.m */; };
+		EF667F1F1C1FE18200CB7AC7 /* Pin.m in Sources */ = {isa = PBXBuildFile; fileRef = EF667F1E1C1FE18200CB7AC7 /* Pin.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,8 @@
 		EF3616191C0917D100F3BB58 /* TwitterDataObservatoryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TwitterDataObservatoryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EF36161E1C0917D100F3BB58 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EF36161F1C0917D100F3BB58 /* TwitterDataObservatoryTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TwitterDataObservatoryTests.m; sourceTree = "<group>"; };
+		EF667F1D1C1FDFBB00CB7AC7 /* Pin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Pin.h; sourceTree = "<group>"; };
+		EF667F1E1C1FE18200CB7AC7 /* Pin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Pin.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +114,8 @@
 				EF3616121C0917D100F3BB58 /* LaunchScreen.xib */,
 				EF3616071C0917D100F3BB58 /* TwitterDataObservatory.xcdatamodeld */,
 				EF3616001C0917D000F3BB58 /* Supporting Files */,
+				EF667F1D1C1FDFBB00CB7AC7 /* Pin.h */,
+				EF667F1E1C1FE18200CB7AC7 /* Pin.m */,
 			);
 			path = TwitterDataObservatory;
 			sourceTree = "<group>";
@@ -304,6 +309,7 @@
 				EF3616091C0917D100F3BB58 /* TwitterDataObservatory.xcdatamodeld in Sources */,
 				EF3616061C0917D100F3BB58 /* AppDelegate.m in Sources */,
 				EF36160C1C0917D100F3BB58 /* ViewController.m in Sources */,
+				EF667F1F1C1FE18200CB7AC7 /* Pin.m in Sources */,
 				EF3616031C0917D000F3BB58 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

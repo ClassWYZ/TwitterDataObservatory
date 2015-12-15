@@ -7,6 +7,8 @@
 //
 
 #import "ViewController.h"
+#import "Pin.h"
+#import <float.h>
 @import Twitter;
 @import Social;
 @import Accounts;
@@ -14,6 +16,7 @@
 @interface ViewController ()
 
 @property (nonatomic, strong) NSURLConnection *twitterConnection;
+@property (strong, nonatomic) CLLocationManager *manager;
 
 @end
 
@@ -23,6 +26,19 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self.manager requestAlwaysAuthorization];
+    //[self startLocations];
+    CLLocationCoordinate2D sampleCoordinate = CLLocationCoordinate2DMake(40.7903, -73.9597);
+    MKPointAnnotation *sampleAnnotation = [[MKPointAnnotation alloc] init];
+    sampleAnnotation.coordinate = sampleCoordinate;
+    [self.mapView addAnnotation:sampleAnnotation];
+    MKCoordinateRegion region;
+    region.center = sampleCoordinate;
+    region.span.latitudeDelta = 0.01;
+    region.span.longitudeDelta = 0.01;
+    
+    [self.mapView setRegion:region animated:YES];
+    NSLog(@"aa");
     // Do any additional setup after loading the view, typically from a nib.
     //self.label.text = [NSString stringWithFormat:@"success!"];
     //self.mainLabel.text = [NSString stringWithFormat:@"success!"];
@@ -87,7 +103,7 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
                                             
                                             json = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
                                             id jsonObject = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&error2];
-                                            NSLog(@"JSON: %@", jsonString);
+                                            //NSLog(@"JSON: %@", jsonString);
                                         }
                                      }
                                      if (json) {
@@ -124,8 +140,12 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
                                             [newlyConstructedElement setValue:[tweetsStatus[i] valueForKey:@"place"] forKey:@"geo"];
                                              [analyzedTweets addObject:newlyConstructedElement];
                                          }
-                                         //NSLog(analyzedTweets);
-                                        
+                                         
+                                         RegionBounding mapBounding = [self caculateRegionBounding:analyzedTweets];
+                                         [self updateRegionInMapView:mapBounding];
+                                         
+                                         NSLog(@"aaaa");
+                                         
                                      }
                                  }];
                                  
@@ -177,4 +197,139 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
             break;
     }
 }
+
+#pragma mark - Twitter Location Management
+
+- (RegionBounding)caculateRegionBounding:(NSArray *)locations {
+    RegionBounding result;
+    result.leftBound = DBL_MAX;
+    result.rightBound = DBL_MIN;
+    result.upperBound = DBL_MIN;
+    result.lowerBound = DBL_MAX;
+    for (NSDictionary *element in locations) {
+        NSDictionary *currentGeoInfo = element[@"geo"];
+        if (![currentGeoInfo isKindOfClass:[NSDictionary class]]) {
+            return result;
+        }
+        NSDictionary *currentBoundingBox = currentGeoInfo[@"bounding_box"];
+        NSArray *currentCoordinates = currentBoundingBox[@"coordinates"];
+        CLLocationCoordinate2D currentCenter;
+        for (NSArray *point in currentCoordinates[0]) {
+            NSNumber* currentLatitude = point[1];
+            NSNumber* currentLongtitude = point[0];
+            currentCenter.latitude += [currentLatitude doubleValue];
+            currentCenter.longitude += [currentLongtitude doubleValue];
+        }
+        currentCenter.latitude /= 4;
+        currentCenter.longitude /= 4;
+        result.leftBound = MIN(result.leftBound, currentCenter.longitude);
+        result.rightBound = MAX(result.rightBound, currentCenter.longitude);
+        result.upperBound = MAX(result.upperBound, currentCenter.latitude);
+        result.lowerBound = MIN(result.lowerBound, currentCenter.latitude);
+    }
+    return result;
+}
+
+- (void)updateRegionInMapView:(RegionBounding) mapBounding {
+    CLLocationCoordinate2D centerCoordinate = CLLocationCoordinate2DMake((mapBounding.upperBound +mapBounding.lowerBound) / 2, (mapBounding.leftBound + mapBounding.rightBound) / 2);
+    MKCoordinateRegion updatedRegion;
+    updatedRegion.center = centerCoordinate;
+    updatedRegion.span.latitudeDelta = mapBounding.upperBound - mapBounding.lowerBound;
+    updatedRegion.span.longitudeDelta = mapBounding.rightBound - mapBounding.leftBound;
+    [self.mapView setRegion:updatedRegion animated:YES];
+}
+
+#pragma mark - Location Manager
+
+- (CLLocationManager *)manager {
+    if (!_manager) {
+        _manager = [[CLLocationManager alloc]init];
+        _manager.delegate = self;
+        _manager.desiredAccuracy = kCLLocationAccuracyBest;
+    }
+    return _manager;
+}
+
+- (void)startLocations {
+    
+    // create and start the location manager
+    
+    [self.manager startUpdatingLocation];
+}
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
+    
+    //self.view.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"blue"]];
+    
+    // grab current location and display it in a label
+    CLLocation *currentLocation = [locations lastObject];
+    
+    NSString *longText = [NSString stringWithFormat:@"%f", currentLocation.coordinate.longitude];
+    NSString *latText = [NSString stringWithFormat:@"%f", currentLocation.coordinate.latitude];
+    NSString *accuracy = [NSString stringWithFormat:@"%f", currentLocation.horizontalAccuracy];
+    
+    //self.longLabel.text = longText;
+    //self.latLabel.text = latText;
+    //self.accuracyLabel.text = accuracy;
+    
+    // and update our Map View
+    [self updateMapView:currentLocation];
+}
+
+#pragma mark - Map Kit
+
+- (void)updateMapView:(CLLocation *)location {
+    
+    // create a region and pass it to the Map View
+    MKCoordinateRegion region;
+    region.center.latitude = location.coordinate.latitude;
+    region.center.longitude = location.coordinate.longitude;
+    region.span.latitudeDelta = 0.001;
+    region.span.longitudeDelta = 0.001;
+    
+    [self.mapView setRegion:region animated:YES];
+    
+    // remove previous marker
+    MKPlacemark *previousMarker = [self.mapView.annotations lastObject];
+    [self.mapView removeAnnotation:previousMarker];
+    
+    // create a new marker in the middle
+    MKPlacemark *marker = [[MKPlacemark alloc]initWithCoordinate:location.coordinate addressDictionary:nil];
+    [self.mapView addAnnotation:marker];
+    
+    // create an address from our coordinates
+    /*
+    CLGeocoder *geocoder = [[CLGeocoder alloc]init];
+    [geocoder reverseGeocodeLocation:location completionHandler:^(NSArray *placemarks, NSError *error) {
+        
+        CLPlacemark *placemark = [placemarks lastObject];
+        NSString *address = [NSString stringWithFormat:@"%@, %@, %@, %@", placemark.thoroughfare, placemark.locality, placemark.administrativeArea, placemark.postalCode];
+        if (placemark.thoroughfare != NULL) {
+            self.addressLabel.text = address;
+        } else {
+            self.addressLabel.text = @"";
+        }
+        
+    }];
+    */
+}
+
+// let the user add their own pins
+
+- (void)addPin:(UIGestureRecognizer *)recognizer {
+    
+    if (recognizer.state != UIGestureRecognizerStateBegan) {
+        return;
+    }
+    
+    // convert touched position to map coordinate
+    CGPoint userTouch = [recognizer locationInView:self.mapView];
+    CLLocationCoordinate2D mapPoint = [self.mapView convertPoint:userTouch toCoordinateFromView:self.mapView];
+    
+    // and add it to our view
+    Pin *newPin = [[Pin alloc]initWithCoordinate:mapPoint];
+    [self.mapView addAnnotation:newPin];
+    
+}
+
 @end

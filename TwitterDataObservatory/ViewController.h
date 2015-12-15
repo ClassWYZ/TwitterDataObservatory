@@ -8,8 +8,16 @@
 
 #import <UIKit/UIKit.h>
 @import MapKit;
+@import CoreLocation;
 
-@interface ViewController : UIViewController
+typedef struct {
+    CLLocationDegrees upperBound;
+    CLLocationDegrees lowerBound;
+    CLLocationDegrees leftBound;
+    CLLocationDegrees rightBound;
+} RegionBounding;
+
+@interface ViewController : UIViewController <CLLocationManagerDelegate>
 
 extern NSString* const sentimentEngine;
 @property (strong, nonatomic) IBOutlet MKMapView *mapView;
