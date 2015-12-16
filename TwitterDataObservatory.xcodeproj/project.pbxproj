@@ -18,6 +18,7 @@
 		EF3616141C0917D100F3BB58 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = EF3616121C0917D100F3BB58 /* LaunchScreen.xib */; };
 		EF3616201C0917D100F3BB58 /* TwitterDataObservatoryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EF36161F1C0917D100F3BB58 /* TwitterDataObservatoryTests.m */; };
 		EF667F1F1C1FE18200CB7AC7 /* Pin.m in Sources */ = {isa = PBXBuildFile; fileRef = EF667F1E1C1FE18200CB7AC7 /* Pin.m */; };
+		EFD8E22F1C2140EF00E2C819 /* TweetAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = EFD8E22E1C2140EF00E2C819 /* TweetAnnotation.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,8 @@
 		EF36161F1C0917D100F3BB58 /* TwitterDataObservatoryTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TwitterDataObservatoryTests.m; sourceTree = "<group>"; };
 		EF667F1D1C1FDFBB00CB7AC7 /* Pin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Pin.h; sourceTree = "<group>"; };
 		EF667F1E1C1FE18200CB7AC7 /* Pin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Pin.m; sourceTree = "<group>"; };
+		EFD8E22D1C213F2400E2C819 /* TweetAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweetAnnotation.h; sourceTree = "<group>"; };
+		EFD8E22E1C2140EF00E2C819 /* TweetAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TweetAnnotation.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +119,8 @@
 				EF3616001C0917D000F3BB58 /* Supporting Files */,
 				EF667F1D1C1FDFBB00CB7AC7 /* Pin.h */,
 				EF667F1E1C1FE18200CB7AC7 /* Pin.m */,
+				EFD8E22D1C213F2400E2C819 /* TweetAnnotation.h */,
+				EFD8E22E1C2140EF00E2C819 /* TweetAnnotation.m */,
 			);
 			path = TwitterDataObservatory;
 			sourceTree = "<group>";
@@ -306,6 +311,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EFD8E22F1C2140EF00E2C819 /* TweetAnnotation.m in Sources */,
 				EF3616091C0917D100F3BB58 /* TwitterDataObservatory.xcdatamodeld in Sources */,
 				EF3616061C0917D100F3BB58 /* AppDelegate.m in Sources */,
 				EF36160C1C0917D100F3BB58 /* ViewController.m in Sources */,

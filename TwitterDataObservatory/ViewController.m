@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "Pin.h"
+#import "TweetAnnotation.h"
 #import <float.h>
 @import Twitter;
 @import Social;
@@ -17,6 +18,7 @@
 
 @property (nonatomic, strong) NSURLConnection *twitterConnection;
 @property (strong, nonatomic) CLLocationManager *manager;
+@property (assign, nonatomic) NSInteger pinCounter;
 
 @end
 
@@ -27,11 +29,18 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self.manager requestAlwaysAuthorization];
+    self.pinCounter = 0;
+    self.mapView.delegate = self;
     //[self startLocations];
     CLLocationCoordinate2D sampleCoordinate = CLLocationCoordinate2DMake(40.7903, -73.9597);
-    MKPointAnnotation *sampleAnnotation = [[MKPointAnnotation alloc] init];
+    //MKPointAnnotation *sampleAnnotation = [[MKPointAnnotation alloc] init];
+    TweetAnnotation *sampleAnnotation = [[TweetAnnotation alloc] initWithCoordinate:sampleCoordinate withPolarity:4];
+    NSMutableArray *sampleAnnotations = [[NSMutableArray alloc] init];
+    [sampleAnnotations addObject:sampleAnnotation];
     sampleAnnotation.coordinate = sampleCoordinate;
-    [self.mapView addAnnotation:sampleAnnotation];
+    //dispatch_async(dispatch_get_main_queue(), ^{
+        [self.mapView addAnnotations:sampleAnnotations];
+    //});
     MKCoordinateRegion region;
     region.center = sampleCoordinate;
     region.span.latitudeDelta = 0.01;
@@ -61,7 +70,7 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
                                  ACAccount *account = [twitterAccounts objectAtIndex:0];
                                  NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
                                  [params setObject:@"" forKey:@"q"];
-                                 [params setObject:@"40.7903,-73.9597,1mi" forKey:@"geocode"];
+                                 [params setObject:@"40.7903,-73.9597,10mi" forKey:@"geocode"];
                                  [params setObject:@"100" forKey:@"count"];
                                  //set any other criteria to track
                                  //params setObject:@"words, to, track" forKey@"track"];
@@ -142,7 +151,8 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
                                          }
                                          
                                          RegionBounding mapBounding = [self caculateRegionBounding:analyzedTweets];
-                                         [self updateRegionInMapView:mapBounding];
+                                         //[self updateRegionInMapView:mapBounding];
+                                         [self updatePinInMapView:analyzedTweets];
                                          
                                          NSLog(@"aaaa");
                                          
@@ -237,6 +247,79 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
     updatedRegion.span.latitudeDelta = mapBounding.upperBound - mapBounding.lowerBound;
     updatedRegion.span.longitudeDelta = mapBounding.rightBound - mapBounding.leftBound;
     [self.mapView setRegion:updatedRegion animated:YES];
+}
+
+- (void)updatePinInMapView:(NSArray *) tweets {
+    for (NSDictionary *element in tweets) {
+        NSDictionary *currentGeoInfo = element[@"geo"];
+        if (![currentGeoInfo isKindOfClass:[NSDictionary class]]) {
+            continue;
+        }
+        NSDictionary *currentBoundingBox = currentGeoInfo[@"bounding_box"];
+        NSArray *currentCoordinates = currentBoundingBox[@"coordinates"];
+        CLLocationCoordinate2D currentCenter;
+        currentCenter.latitude = 0;
+        currentCenter.longitude = 0;
+        for (NSArray *point in currentCoordinates[0]) {
+            NSNumber* currentLatitude = point[1];
+            NSNumber* currentLongtitude = point[0];
+            currentCenter.latitude += [currentLatitude doubleValue];
+            currentCenter.longitude += [currentLongtitude doubleValue];
+        }
+        currentCenter.latitude /= 4;
+        currentCenter.longitude /= 4;
+        //MKPointAnnotation *currentAnnotation = [[MKPointAnnotation alloc] init];
+        //currentAnnotation.coordinate = currentCenter;
+        long currentPolarity = [element[@"polarity"] longValue];
+        TweetAnnotation *currentAnnotation = [[TweetAnnotation alloc] initWithCoordinate:currentCenter withPolarity:currentPolarity];
+        //[self.mapView addAnnotation:currentAnnotation];
+        //dispatch_async(dispatch_get_main_queue(), ^{
+            [self.mapView addAnnotation:currentAnnotation];
+        //});
+        //[self.view addSubview:self.mapView];
+        //[self.mapView addAnnotation:currentAnnotation];
+        self.pinCounter++;
+    }
+}
+
+#pragma mark - MKMapViewDelegate Methods
+
+- (MKAnnotationView *) mapView:(MKMapView *)thisMapView
+             viewForAnnotation:(TweetAnnotation *)annotation {
+    
+    //the annotation view objects act like cells in a tableview.  When off screen,
+    //they are added to a queue waiting to be reused.  This code mirrors that for
+    //getting a table cell.  First check if the queue has available annotation views
+    //of the right type, identified by the identifier string.  If nil is returned,
+    //then allocate a new annotation view.
+    
+    static NSString *tweetLocationIdentifier = @"tweetLocationIdentifier";
+    
+    //the result of the call is being cast (MKPinAnnotationView *) to the correct
+    //view class or else the compiler complains
+    MKPinAnnotationView *annotationView = (MKPinAnnotationView *)[thisMapView
+                                                                  dequeueReusableAnnotationViewWithIdentifier:tweetLocationIdentifier];
+    if (annotationView == nil) {
+        annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:tweetLocationIdentifier];
+    }
+    
+    if (annotation.polarity == 0) {
+        annotationView.pinColor = MKPinAnnotationColorGreen;
+    }
+    else if (annotation.polarity == 2) {
+        annotationView.pinColor = MKPinAnnotationColorRed;
+    }
+    else if (annotation.polarity == 4) {
+        annotationView.pinColor = MKPinAnnotationColorPurple;
+    }
+    
+    //pin drops when it first appears
+    annotationView.animatesDrop=TRUE;
+    
+    //tapping the pin produces a gray box which shows title and subtitle
+    annotationView.canShowCallout = NO;
+    
+    return annotationView;
 }
 
 #pragma mark - Location Manager

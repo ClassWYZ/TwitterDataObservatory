@@ -17,7 +17,7 @@ typedef struct {
     CLLocationDegrees rightBound;
 } RegionBounding;
 
-@interface ViewController : UIViewController <CLLocationManagerDelegate>
+@interface ViewController : UIViewController <CLLocationManagerDelegate, MKMapViewDelegate>
 
 extern NSString* const sentimentEngine;
 @property (strong, nonatomic) IBOutlet MKMapView *mapView;
