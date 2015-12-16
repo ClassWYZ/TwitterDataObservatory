@@ -32,6 +32,7 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
     self.pinCounter = 0;
     self.mapView.delegate = self;
     //[self startLocations];
+    /*
     CLLocationCoordinate2D sampleCoordinate = CLLocationCoordinate2DMake(40.7903, -73.9597);
     //MKPointAnnotation *sampleAnnotation = [[MKPointAnnotation alloc] init];
     TweetAnnotation *sampleAnnotation = [[TweetAnnotation alloc] initWithCoordinate:sampleCoordinate withPolarity:4];
@@ -48,6 +49,7 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
     
     [self.mapView setRegion:region animated:YES];
     NSLog(@"aa");
+     */
     // Do any additional setup after loading the view, typically from a nib.
     //self.label.text = [NSString stringWithFormat:@"success!"];
     //self.mainLabel.text = [NSString stringWithFormat:@"success!"];
@@ -70,7 +72,7 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
                                  ACAccount *account = [twitterAccounts objectAtIndex:0];
                                  NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
                                  [params setObject:@"" forKey:@"q"];
-                                 [params setObject:@"40.7903,-73.9597,10mi" forKey:@"geocode"];
+                                 [params setObject:@"40.7903,-73.9597,100mi" forKey:@"geocode"];
                                  [params setObject:@"100" forKey:@"count"];
                                  //set any other criteria to track
                                  //params setObject:@"words, to, track" forKey@"track"];
@@ -151,7 +153,7 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
                                          }
                                          
                                          RegionBounding mapBounding = [self caculateRegionBounding:analyzedTweets];
-                                         //[self updateRegionInMapView:mapBounding];
+                                         [self updateRegionInMapView:mapBounding];
                                          [self updatePinInMapView:analyzedTweets];
                                          
                                          NSLog(@"aaaa");
@@ -212,10 +214,10 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
 
 - (RegionBounding)caculateRegionBounding:(NSArray *)locations {
     RegionBounding result;
-    result.leftBound = DBL_MAX;
-    result.rightBound = DBL_MIN;
-    result.upperBound = DBL_MIN;
-    result.lowerBound = DBL_MAX;
+    result.leftBound = -180;
+    result.rightBound = 180;
+    result.upperBound = 90;
+    result.lowerBound = -90;
     for (NSDictionary *element in locations) {
         NSDictionary *currentGeoInfo = element[@"geo"];
         if (![currentGeoInfo isKindOfClass:[NSDictionary class]]) {
@@ -224,6 +226,8 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
         NSDictionary *currentBoundingBox = currentGeoInfo[@"bounding_box"];
         NSArray *currentCoordinates = currentBoundingBox[@"coordinates"];
         CLLocationCoordinate2D currentCenter;
+        currentCenter.latitude = 0;
+        currentCenter.longitude = 0;
         for (NSArray *point in currentCoordinates[0]) {
             NSNumber* currentLatitude = point[1];
             NSNumber* currentLongtitude = point[0];
@@ -232,10 +236,26 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
         }
         currentCenter.latitude /= 4;
         currentCenter.longitude /= 4;
-        result.leftBound = MIN(result.leftBound, currentCenter.longitude);
-        result.rightBound = MAX(result.rightBound, currentCenter.longitude);
-        result.upperBound = MAX(result.upperBound, currentCenter.latitude);
-        result.lowerBound = MIN(result.lowerBound, currentCenter.latitude);
+        if (result.leftBound == -180) {
+            result.leftBound = currentCenter.longitude - 0.01;
+        } else {
+            result.leftBound = MIN(result.leftBound, currentCenter.longitude);
+        }
+        if (result.rightBound == 180) {
+            result.rightBound = currentCenter.longitude + 0.01;
+        } else {
+            result.rightBound = MAX(result.rightBound, currentCenter.longitude);
+        }
+        if (result.upperBound == 90) {
+            result.upperBound = currentCenter.latitude + 0.01;
+        } else {
+            result.upperBound = MAX(result.upperBound, currentCenter.latitude);
+        }
+        if (result.lowerBound == -90) {
+            result.lowerBound = currentCenter.latitude - 0.01;
+        } else {
+            result.lowerBound = MIN(result.lowerBound, currentCenter.latitude);
+        }
     }
     return result;
 }
