@@ -14,11 +14,13 @@
 
 @interface TweetAnnotation : NSObject <MKAnnotation>
 
-@property (readwrite, nonatomic) CLLocationCoordinate2D coordinate; 
+@property (readwrite, nonatomic) CLLocationCoordinate2D coordinate;
+@property (readwrite, copy, nonatomic) NSString *title;
+@property (readwrite, copy, nonatomic) NSString *subtitle;
 @property (readwrite, assign, nonatomic) NSInteger polarity;
 
 //programmer provided init function to create the annotation objects
--(id)initWithCoordinate:(CLLocationCoordinate2D)coordinate withPolarity:(NSInteger)polarity;
+-(id)initWithCoordinate:(CLLocationCoordinate2D)coordinate andPolarity:(NSInteger)polarity andTitle:(NSString *)title andSubtitle:(NSString *)subtitle;
 
 
 @end

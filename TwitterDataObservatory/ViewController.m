@@ -291,7 +291,7 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
         //MKPointAnnotation *currentAnnotation = [[MKPointAnnotation alloc] init];
         //currentAnnotation.coordinate = currentCenter;
         long currentPolarity = [element[@"polarity"] longValue];
-        TweetAnnotation *currentAnnotation = [[TweetAnnotation alloc] initWithCoordinate:currentCenter withPolarity:currentPolarity];
+        TweetAnnotation *currentAnnotation = [[TweetAnnotation alloc] initWithCoordinate:currentCenter andPolarity:currentPolarity andTitle:[NSString stringWithFormat:@"ID: %@", [element[@"id"] stringValue]] andSubtitle:[NSString stringWithFormat:@"Tweets: %@", element[@"text"]]];
         //[self.mapView addAnnotation:currentAnnotation];
         //dispatch_async(dispatch_get_main_queue(), ^{
             [self.mapView addAnnotation:currentAnnotation];
@@ -334,10 +334,10 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
     }
     
     //pin drops when it first appears
-    annotationView.animatesDrop=TRUE;
+    annotationView.animatesDrop = TRUE;
     
     //tapping the pin produces a gray box which shows title and subtitle
-    annotationView.canShowCallout = NO;
+    annotationView.canShowCallout = YES;
     
     return annotationView;
 }

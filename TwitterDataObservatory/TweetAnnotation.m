@@ -10,10 +10,12 @@
 
 @implementation TweetAnnotation
 
--(id)initWithCoordinate:(CLLocationCoordinate2D)coordinate withPolarity:(NSInteger)polarity {
+-(id)initWithCoordinate:(CLLocationCoordinate2D)coordinate andPolarity:(NSInteger)polarity andTitle:(NSString *)title andSubtitle:(NSString *)subtitle {
     if (self = [super init]) {
         self.coordinate = coordinate;
         self.polarity = polarity;
+        self.title = title;
+        self.subtitle = subtitle;
     }
     return self;
 }
