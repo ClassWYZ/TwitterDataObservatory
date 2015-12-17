@@ -17,10 +17,17 @@ typedef struct {
     CLLocationDegrees rightBound;
 } RegionBounding;
 
-@interface ViewController : UIViewController <CLLocationManagerDelegate, MKMapViewDelegate>
+typedef struct {
+    int negative;
+    int neutral;
+    int positive;
+} MoodCollection;
+
+@interface ViewController : UIViewController <CLLocationManagerDelegate, MKMapViewDelegate, UITextFieldDelegate>
 
 extern NSString* const sentimentEngine;
 @property (strong, nonatomic) IBOutlet MKMapView *mapView;
+@property (strong, nonatomic) IBOutlet UITextField *seachText;
 - (IBAction)setMap:(id)sender;
 
 @end

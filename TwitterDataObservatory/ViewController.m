@@ -19,6 +19,9 @@
 @property (nonatomic, strong) NSURLConnection *twitterConnection;
 @property (strong, nonatomic) CLLocationManager *manager;
 @property (assign, nonatomic) NSInteger pinCounter;
+@property (nonatomic, assign) MoodCollection tweetsMoodCollection;
+
+- (void) updateMapWithSearchWords:(NSString *) searchWords;
 
 @end
 
@@ -31,6 +34,9 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
     [self.manager requestAlwaysAuthorization];
     self.pinCounter = 0;
     self.mapView.delegate = self;
+    self.seachText.delegate = self;
+    [self initializeTweetsMoodCollection];
+    [self.seachText setText:@"searchText"];
     //[self startLocations];
     /*
     CLLocationCoordinate2D sampleCoordinate = CLLocationCoordinate2DMake(40.7903, -73.9597);
@@ -48,12 +54,78 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
     region.span.longitudeDelta = 0.01;
     
     [self.mapView setRegion:region animated:YES];
-    NSLog(@"aa");
      */
-    // Do any additional setup after loading the view, typically from a nib.
-    //self.label.text = [NSString stringWithFormat:@"success!"];
-    //self.mainLabel.text = [NSString stringWithFormat:@"success!"];
-    //First, we need to obtain the account instance for the user's Twitter account
+    [self updateMapWithSearchWords:@""];
+
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    NSLog(@"Receive response from Twitter");
+    //self.webData = [[NSMutableData alloc] init];
+}
+
+
+- (void)connection:(NSURLConnection *)connection
+    didReceiveData:(NSData *)data {
+    NSLog(@"Data received from Twitter");
+    NSError *error = nil;
+    NSString *dataString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    BOOL testJson = [NSJSONSerialization isValidJSONObject:data];
+    //[self.webData appendData:data];
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    NSLog(@"A");
+    //[self.uiWebView loadData:self.webData MIMEType: @"text/html" textEncodingName: @"UTF-8" baseURL:nil];
+    
+}
+
+- (IBAction)setMap:(id)sender {
+    switch (((UISegmentedControl *) sender).selectedSegmentIndex) {
+        case 0:
+            self.mapView.mapType = MKMapTypeStandard;
+            break;
+        case 1:
+            self.mapView.mapType = MKMapTypeSatellite;
+            break;
+        case 2:
+            self.mapView.mapType = MKMapTypeHybrid;
+            break;
+        default:
+            break;
+    }
+}
+
+#pragma mark - Init Methods
+
+- (void)initializeTweetsMoodCollection {
+    MoodCollection inital;
+    inital.negative = 0;
+    inital.neutral = 0;
+    inital.positive = 0;
+    self.tweetsMoodCollection = inital;
+}
+
+#pragma mark - UITextField Delegate
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    NSLog(@"You entered %@",self.seachText.text);
+    [self.seachText resignFirstResponder];
+    [self.mapView removeAnnotations:self.mapView.annotations];
+    [self updateMapWithSearchWords:self.seachText.text];
+    return YES;
+}
+
+#pragma mark - Map Update Methods
+
+- (void) updateMapWithSearchWords:(NSString *) searchWords {
+     //First, we need to obtain the account instance for the user's Twitter account
     ACAccountStore *store = [[ACAccountStore alloc] init];
     ACAccountType *twitterAccountType = [store accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierTwitter];
     
@@ -71,7 +143,7 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
                                  // Use the first account for simplicity
                                  ACAccount *account = [twitterAccounts objectAtIndex:0];
                                  NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-                                 [params setObject:@"" forKey:@"q"];
+                                 [params setObject:searchWords forKey:@"q"];
                                  [params setObject:@"40.7903,-73.9597,100mi" forKey:@"geocode"];
                                  [params setObject:@"100" forKey:@"count"];
                                  //set any other criteria to track
@@ -156,58 +228,34 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
                                          [self updateRegionInMapView:mapBounding];
                                          [self updatePinInMapView:analyzedTweets];
                                          
-                                         NSLog(@"aaaa");
+                                         NSLog(@"Breakpoint Tester Log");
                                          
                                      }
                                  }];
                                  
                              }
                          }
-                }];
-
+                }];   
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
+#pragma mark - Mood Collection Manipulation
 
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    NSLog(@"Receive response from Twitter");
-    //self.webData = [[NSMutableData alloc] init];
-}
-
-
-- (void)connection:(NSURLConnection *)connection
-    didReceiveData:(NSData *)data {
-    NSLog(@"Data received from Twitter");
-    NSError *error = nil;
-    NSString *dataString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    BOOL testJson = [NSJSONSerialization isValidJSONObject:data];
-    //[self.webData appendData:data];
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    NSLog(@"A");
-    //[self.uiWebView loadData:self.webData MIMEType: @"text/html" textEncodingName: @"UTF-8" baseURL:nil];
-    
-}
-
-- (IBAction)setMap:(id)sender {
-    switch (((UISegmentedControl *) sender).selectedSegmentIndex) {
+- (void)increaseTweetsMoodCollectionByOne:(long) moodPolarity {
+    MoodCollection current = self.tweetsMoodCollection;
+    switch (moodPolarity) {
         case 0:
-            self.mapView.mapType = MKMapTypeStandard;
-            break;
-        case 1:
-            self.mapView.mapType = MKMapTypeSatellite;
+            current.negative++;
             break;
         case 2:
-            self.mapView.mapType = MKMapTypeHybrid;
+            current.neutral++;
+            break;
+        case 4:
+            current.positive++;
             break;
         default:
             break;
     }
+    self.tweetsMoodCollection = current;
 }
 
 #pragma mark - Twitter Location Management
@@ -292,6 +340,9 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
         //currentAnnotation.coordinate = currentCenter;
         long currentPolarity = [element[@"polarity"] longValue];
         TweetAnnotation *currentAnnotation = [[TweetAnnotation alloc] initWithCoordinate:currentCenter andPolarity:currentPolarity andTitle:[NSString stringWithFormat:@"ID: %@", [element[@"id"] stringValue]] andSubtitle:[NSString stringWithFormat:@"Tweets: %@", element[@"text"]]];
+        
+        [self increaseTweetsMoodCollectionByOne:currentPolarity];
+        
         //[self.mapView addAnnotation:currentAnnotation];
         //dispatch_async(dispatch_get_main_queue(), ^{
             [self.mapView addAnnotation:currentAnnotation];
@@ -322,7 +373,9 @@ NSString* const sentimentEngine = @"http://www.sentiment140.com/api/bulkClassify
     if (annotationView == nil) {
         annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:tweetLocationIdentifier];
     }
-    
+    //Negative: Green
+    //Neutural: Red
+    //Positive: Purple
     if (annotation.polarity == 0) {
         annotationView.pinColor = MKPinAnnotationColorGreen;
     }
